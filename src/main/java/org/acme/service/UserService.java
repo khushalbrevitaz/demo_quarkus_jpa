@@ -1,9 +1,13 @@
 package org.acme.service;
 
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import jakarta.inject.Inject;
 import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
+import org.acme.entity.User;
+import org.acme.repository.UserRepository;
 import org.jboss.logging.Logger;
 
 
@@ -14,18 +18,39 @@ public class UserService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Inject
+    UserRepository userRepository;
 
     @Transactional
-    public void findOrCreateUser(String email) {
-        invokeRandomSleepProcedure();
+    public User findOrCreateUser(String email) {
+          LOG.info("Executing findOrCreateUser on thread: " + Thread.currentThread().getName());
+
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be null or empty");
+        }
+        var startTime = System.currentTimeMillis();
+        User existingUser = userRepository.findByEmail(email);
+        var took = System.currentTimeMillis() - startTime;
+        LOG.info("Completed random_sleep stored procedure in blocking. took = {} " + took + " ms");
+
+        if (existingUser != null) {
+            LOG.info("User email is : "+ existingUser.getEmail());
+            return existingUser;
+        }
+
+        // If user is not found, create a new one
+        User newUser = new User(email);
+        userRepository.persist(newUser);
+        LOG.info("User email is : "+ newUser.getEmail());
+        return newUser;
     }
-    private void invokeRandomSleepProcedure() {
+    public void invokeRandomSleepProcedure() {
         // Calling the stored procedure using native query
         var startTime = System.currentTimeMillis();
         LOG.info("Invoking random_sleep stored procedure on thread: " + Thread.currentThread().getName());
         entityManager.createStoredProcedureQuery("random_sleep").execute();
         var took = System.currentTimeMillis() - startTime;
-        LOG.info("Completed random_sleep stored procedure. took = {} " + took + " ms");
+        LOG.info("Completed random_sleep stored procedure in blocking. took = {} " + took + " ms");
     }
 
 //
