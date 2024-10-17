@@ -1,6 +1,7 @@
 package org.acme.controller;
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.smallrye.mutiny.Uni;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -8,16 +9,21 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import org.acme.dto.GetUserCountCreationPerCompanyPerYear;
 import org.acme.entity.User;
 import org.acme.service.UserService;
 import org.eclipse.microprofile.config.ConfigProvider;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Path("/rest")
 public class GreetingResource {
 
     @Inject
     UserService userService;
-
 
     @GET
     @Path("/findOrCreate")
@@ -47,4 +53,17 @@ public class GreetingResource {
          userService.invokeRandomSleepProcedure();
     }
 
+    @GET
+    @Path("/companies/user/count")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<GetUserCountCreationPerCompanyPerYear> getUserCountPerCompany() throws IOException {
+        return userService.getUserCountPerCompany();
+    }
+
+    @GET
+    @Path("/hello")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getHello() {
+        return "hello";
+    }
 }
