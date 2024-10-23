@@ -1,6 +1,5 @@
 package org.acme.service;
 
-import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import jakarta.inject.Inject;
@@ -44,13 +43,12 @@ public class UserService {
         LOG.info("User email is : "+ newUser.getEmail());
         return newUser;
     }
-    public void invokeRandomSleepProcedure() {
+    public void callStoredProcedureWithFakeDelay() {
         // Calling the stored procedure using native query
         var startTime = System.currentTimeMillis();
-        LOG.info("Invoking random_sleep stored procedure on thread: " + Thread.currentThread().getName());
-        entityManager.createStoredProcedureQuery("random_sleep").execute();
-        var took = System.currentTimeMillis() - startTime;
-        LOG.info("Completed random_sleep stored procedure in blocking. took = {} " + took + " ms");
+        LOG.info("Invoking fake_delay stored procedure on thread: " + Thread.currentThread().getName());
+        entityManager.createStoredProcedureQuery("fake_delay").execute();
+        LOG.info("Completed fake_delay stored procedure in blocking. took = {} " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
 //

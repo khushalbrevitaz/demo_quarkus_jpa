@@ -10,7 +10,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO) // Or GenerationType.AUTO if you want the database to handle it
     private Long id;
 
-
+    @Column(nullable = true)
+    private String name;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -44,6 +45,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
